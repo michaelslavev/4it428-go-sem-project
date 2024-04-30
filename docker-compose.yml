@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  api-gateway:
+    build: ./services/api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - auth-service
+      - newsletter-management-service
+      - subscription-service
+      - publishing-service
+
+  auth-service:
+    build: ./services/auth-service
+
+  newsletter-management-service:
+    build: ./services/newsletter-management-service
+
+  subscription-service:
+    build: ./services/subscription-service
+
+  publishing-service:
+    build: ./services/publishing-service
+
+
+networks:
+  default:
+    driver: bridge
