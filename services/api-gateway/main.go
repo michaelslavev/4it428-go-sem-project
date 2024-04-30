@@ -1,73 +1,57 @@
 package main
 
 import (
+	"api-gateway/transport"
 	"api-gateway/utils"
 	"fmt"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/golang-jwt/jwt"
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
-	"net/http/httputil"
-	"net/url"
 	"strings"
 )
 
 func main() {
 	cfg := utils.LoadConfig(".env")
 
-	r := mux.NewRouter()
-	address := cfg.IP + ":" + cfg.Port
-	log.Printf("Server starting on %s", address)
+	r := chi.NewRouter()
+	r.Use(middleware.Logger)
 
-	// ----| PUBLIC ROUTES
+	// Public Routes
 	// auth-service
-	r.HandleFunc("/register", proxyRequest(cfg.AuthServiceURL)).Methods("POST")
-	r.HandleFunc("/login", proxyRequest(cfg.AuthServiceURL)).Methods("POST")
-	r.HandleFunc("/refreshToken", proxyRequest(cfg.AuthServiceURL)).Methods("POST")
-	r.HandleFunc("/changePassword", proxyRequest(cfg.AuthServiceURL)).Methods("POST")
+	r.Post("/register", transport.ProxyRequest(cfg.AuthServiceURL))
+	r.Post("/login", transport.ProxyRequest(cfg.AuthServiceURL))
+	r.Post("/refreshToken", transport.ProxyRequest(cfg.AuthServiceURL))
+	r.Post("/changePassword", transport.ProxyRequest(cfg.AuthServiceURL))
 
 	// newsletter-management-service
-	r.HandleFunc("/listNewsletters", proxyRequest(cfg.NewsletterServiceURL)).Methods("GET")
+	r.Get("/listNewsletters", transport.ProxyRequest(cfg.NewsletterServiceURL))
 
 	// subscription-service
-	r.HandleFunc("/subscribe", proxyRequest(cfg.SubscriptionServiceURL)).Methods("POST")
-	r.HandleFunc("/unsubscribe", proxyRequest(cfg.SubscriptionServiceURL)).Methods("POST")
+	r.Post("/subscribe", transport.ProxyRequest(cfg.SubscriptionServiceURL))
+	r.Post("/unsubscribe", transport.ProxyRequest(cfg.SubscriptionServiceURL))
 
-	// ----| PRIVATE ROUTES requiring JWT validation
-	s := r.PathPrefix("/api").Subrouter()
-	s.Use(JWTMiddleware)
-	// newsletter-management-service
-	s.HandleFunc("/createNewsletter", proxyRequest(cfg.NewsletterServiceURL)).Methods("POST")
-	s.HandleFunc("/renameNewsletter", proxyRequest(cfg.NewsletterServiceURL)).Methods("POST")
-	s.HandleFunc("/deleteNewsletter", proxyRequest(cfg.NewsletterServiceURL)).Methods("POST")
+	// Private Routes requiring JWT validation
+	r.Route("/api", func(r chi.Router) {
+		r.Use(JWTMiddleware)
 
-	// publishing-service
-	s.HandleFunc("/publishPost", proxyRequest(cfg.PublishingServiceURL)).Methods("POST")
-	s.HandleFunc("/listSubscribers", proxyRequest(cfg.PublishingServiceURL)).Methods("GET")
+		// newsletter-management-service
+		r.Post("/createNewsletter", transport.ProxyRequest(cfg.NewsletterServiceURL))
+		r.Post("/renameNewsletter", transport.ProxyRequest(cfg.NewsletterServiceURL))
+		r.Post("/deleteNewsletter", transport.ProxyRequest(cfg.NewsletterServiceURL))
+
+		// publishing-service
+		r.Post("/publishPost", transport.ProxyRequest(cfg.PublishingServiceURL))
+		r.Get("/listSubscribers", transport.ProxyRequest(cfg.PublishingServiceURL))
+	})
 
 	// Starting server
+	address := cfg.IP + ":" + cfg.Port
+	log.Printf("Server starting on %s", address)
 	err := http.ListenAndServe(address, r)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
-	}
-}
-
-func proxyRequest(target string) func(http.ResponseWriter, *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		targetUrl, err := url.Parse(target)
-		if err != nil {
-			log.Printf("Error parsing URL: %v", err)
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
-			return
-		}
-
-		proxy := httputil.NewSingleHostReverseProxy(targetUrl)
-		r.URL.Host = targetUrl.Host
-		r.URL.Scheme = targetUrl.Scheme
-		r.Header.Set("X-Forwarded-Host", r.Header.Get("Host"))
-		r.Host = targetUrl.Host
-
-		proxy.ServeHTTP(w, r)
 	}
 }
 
@@ -79,17 +63,13 @@ func JWTMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		// Trim Bearer prefix if you use it
 		tokenString = strings.TrimPrefix(tokenString, "Bearer ")
-
-		// Parse the token
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			// Don't forget to validate the alg is what you expect:
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}
 
-			return []byte("your-256-bit-secret"), nil // Use your secret
+			return []byte("your-256-bit-secret"), nil
 		})
 
 		if err != nil || !token.Valid {
@@ -97,7 +77,6 @@ func JWTMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		// Token is valid
 		next.ServeHTTP(w, r)
 	})
 }

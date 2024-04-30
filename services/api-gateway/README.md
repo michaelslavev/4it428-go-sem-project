@@ -2,6 +2,6 @@
 
 ## How to run independently from docker-compose?
 ```shell
-..\> docker build -t api-gateway .
-..\> docker run api-gateway
+..\> docker build -t transport-gateway .
+..\> docker run transport-gateway
 ```
