@@ -3,7 +3,8 @@ package main
 import (
 	"auth-service/utils"
 	"encoding/json"
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"log"
 	"net/http"
 )
@@ -45,15 +46,19 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	cfg := utils.LoadConfig(".env")
 
-	r := mux.NewRouter()
-	address := cfg.IP + ":" + cfg.Port
-	log.Printf("Server starting on %s", address)
+	r := chi.NewRouter()
+	r.Use(middleware.Logger)
 
-	// Set up routes
-	r.HandleFunc("/register", registerHandler).Methods("POST")
-	r.HandleFunc("/login", loginHandler).Methods("POST")
+	r.Route("/api", func(r chi.Router) {
+		r.Post("/register", registerHandler)
+		r.Post("/login", loginHandler)
+		r.Post("/refreshToken", loginHandler)
+		r.Post("/changePassword", loginHandler)
+	})
 
 	// Starting server
+	address := cfg.IP + ":" + cfg.Port
+	log.Printf("Server starting on %s", address)
 	err := http.ListenAndServe(address, r)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
