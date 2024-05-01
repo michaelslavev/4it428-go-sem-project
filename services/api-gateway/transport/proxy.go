@@ -1,6 +1,7 @@
 package transport
 
 import (
+	"api-gateway/utils"
 	"fmt"
 	"github.com/golang-jwt/jwt"
 	"log"
@@ -10,7 +11,7 @@ import (
 	"strings"
 )
 
-func ProxyRequest(target string, isPublic bool) func(http.ResponseWriter, *http.Request) {
+func ProxyRequest(target string, isPublic bool, cfg utils.ServerConfig) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Check JWT if the route is not public
 		if !isPublic {
@@ -25,8 +26,8 @@ func ProxyRequest(target string, isPublic bool) func(http.ResponseWriter, *http.
 				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 					return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 				}
-				// Ensure the secret used here is the same one used when issuing the JWT
-				return []byte("your-256-bit-secret"), nil
+
+				return []byte(cfg.JWTSecret), nil
 			})
 
 			if err != nil || !token.Valid {

@@ -9,6 +9,7 @@ import (
 type ServerConfig struct {
 	IP                     string
 	Port                   string
+	JWTSecret              string
 	AuthServiceURL         string
 	NewsletterServiceURL   string
 	SubscriptionServiceURL string
@@ -23,6 +24,7 @@ func LoadConfig(envPath string) ServerConfig {
 	return ServerConfig{
 		IP:                     getEnv("SERVER_IP", "0.0.0.0"),
 		Port:                   getEnv("SERVER_PORT", "8080"),
+		JWTSecret:              getEnv("JWT_SECRET", "abc"),
 		AuthServiceURL:         getEnv("AUTH_SERVICE_URL", "localhost"),
 		NewsletterServiceURL:   getEnv("NEWSLETTER_SERVICE_URL", "localhost"),
 		SubscriptionServiceURL: getEnv("SUBSCRIPTION_SERVICE_URL", "localhost"),

@@ -18,27 +18,27 @@ func main() {
 	r.Route("/api", func(r chi.Router) {
 		//-----| Public Routes
 		// auth-service
-		r.Post("/register", transport.ProxyRequest(cfg.AuthServiceURL, true))
-		r.Post("/login", transport.ProxyRequest(cfg.AuthServiceURL, true))
-		r.Post("/refreshToken", transport.ProxyRequest(cfg.AuthServiceURL, true))
-		r.Post("/changePassword", transport.ProxyRequest(cfg.AuthServiceURL, true))
+		r.Post("/register", transport.ProxyRequest(cfg.AuthServiceURL, true, cfg))
+		r.Post("/login", transport.ProxyRequest(cfg.AuthServiceURL, true, cfg))
+		r.Post("/refreshToken", transport.ProxyRequest(cfg.AuthServiceURL, true, cfg))
+		r.Post("/changePassword", transport.ProxyRequest(cfg.AuthServiceURL, true, cfg))
 
 		// newsletter-management-service
-		r.Get("/listNewsletters", transport.ProxyRequest(cfg.NewsletterServiceURL, true))
+		r.Get("/listNewsletters", transport.ProxyRequest(cfg.NewsletterServiceURL, true, cfg))
 
 		// subscription-service
-		r.Post("/subscribe", transport.ProxyRequest(cfg.SubscriptionServiceURL, true))
-		r.Post("/unsubscribe", transport.ProxyRequest(cfg.SubscriptionServiceURL, true))
+		r.Post("/subscribe", transport.ProxyRequest(cfg.SubscriptionServiceURL, true, cfg))
+		r.Post("/unsubscribe", transport.ProxyRequest(cfg.SubscriptionServiceURL, true, cfg))
 
 		//-----| Private Routes requiring JWT validation
 		// newsletter-management-service
-		r.Post("/createNewsletter", transport.ProxyRequest(cfg.NewsletterServiceURL, false))
-		r.Post("/renameNewsletter", transport.ProxyRequest(cfg.NewsletterServiceURL, false))
-		r.Post("/deleteNewsletter", transport.ProxyRequest(cfg.NewsletterServiceURL, false))
+		r.With().Post("/createNewsletter", transport.ProxyRequest(cfg.NewsletterServiceURL, false, cfg))
+		r.Post("/renameNewsletter", transport.ProxyRequest(cfg.NewsletterServiceURL, false, cfg))
+		r.Post("/deleteNewsletter", transport.ProxyRequest(cfg.NewsletterServiceURL, false, cfg))
 
 		// publishing-service
-		r.Post("/publishPost", transport.ProxyRequest(cfg.PublishingServiceURL, false))
-		r.Get("/listSubscribers", transport.ProxyRequest(cfg.PublishingServiceURL, false))
+		r.Post("/publishPost", transport.ProxyRequest(cfg.PublishingServiceURL, false, cfg))
+		r.Get("/listSubscribers", transport.ProxyRequest(cfg.PublishingServiceURL, false, cfg))
 	})
 
 	// Starting server

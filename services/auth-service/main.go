@@ -2,9 +2,11 @@ package main
 
 import (
 	"auth-service/utils"
+	"context"
 	"encoding/json"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	supa "github.com/nedpals/supabase-go"
 	"log"
 	"net/http"
 )
@@ -15,6 +17,14 @@ type User struct {
 	Password string `json:"password"`
 }
 
+var supabase *supa.Client
+var cfg utils.ServerConfig
+
+func init() {
+	cfg = utils.LoadConfig(".env")
+	supabase = supa.CreateClient(cfg.SupabaseURL, cfg.SupabaseKEY)
+}
+
 func registerHandler(w http.ResponseWriter, r *http.Request) {
 	var user User
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
@@ -22,11 +32,22 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Here, add logic to register the user in your system
-	// This might include saving the user details in a database and handling passwords securely
+	ctx := context.Background()
+	resp, err := supabase.Auth.SignUp(ctx, supa.UserCredentials{
+		Email:    user.Username,
+		Password: user.Password,
+	})
+	if err != nil {
+		log.Printf("Failed to register user: %v", err)
+		http.Error(w, "Failed to register user", http.StatusInternalServerError)
+		return
+	}
 
 	log.Printf("Registered user: %s", user.Username)
-	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(resp)
+	if err != nil {
+		return
+	}
 }
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
@@ -36,16 +57,25 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Here, add logic to authenticate the user
-	// This might include checking user credentials against a database
+	ctx := context.Background()
+	loggedUser, err := supabase.Auth.SignIn(ctx, supa.UserCredentials{
+		Email:    user.Username,
+		Password: user.Password,
+	})
+	if err != nil {
+		log.Printf("Failed to login user: %v", err)
+		http.Error(w, "Failed to login user", http.StatusUnauthorized)
+		return
+	}
 
-	log.Printf("Logged in user: %s", user.Username)
-	w.WriteHeader(http.StatusOK)
+	log.Printf("Registered user: %s", user.Username)
+	err = json.NewEncoder(w).Encode(loggedUser)
+	if err != nil {
+		return
+	}
 }
 
 func main() {
-	cfg := utils.LoadConfig(".env")
-
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 

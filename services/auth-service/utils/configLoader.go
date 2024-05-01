@@ -7,8 +7,10 @@ import (
 )
 
 type ServerConfig struct {
-	IP   string
-	Port string
+	IP          string
+	Port        string
+	SupabaseURL string
+	SupabaseKEY string
 }
 
 func LoadConfig(envPath string) ServerConfig {
@@ -17,8 +19,10 @@ func LoadConfig(envPath string) ServerConfig {
 	}
 
 	return ServerConfig{
-		IP:   getEnv("SERVER_IP", "0.0.0.0"),
-		Port: getEnv("SERVER_PORT", "8080"),
+		IP:          getEnv("SERVER_IP", "0.0.0.0"),
+		Port:        getEnv("SERVER_PORT", "8080"),
+		SupabaseURL: getEnv("SUPABASE_URL", "supabase.com"),
+		SupabaseKEY: getEnv("SUPABASE_KEY", "skrrr"),
 	}
 }
 
