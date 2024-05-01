@@ -21,7 +21,7 @@ func main() {
 		r.Post("/register", transport.ProxyRequest(cfg.AuthServiceURL, true, cfg))
 		r.Post("/login", transport.ProxyRequest(cfg.AuthServiceURL, true, cfg))
 		r.Post("/refreshToken", transport.ProxyRequest(cfg.AuthServiceURL, true, cfg))
-		r.Post("/changePassword", transport.ProxyRequest(cfg.AuthServiceURL, true, cfg))
+		//r.Post("/resetPassword", transport.ProxyRequest(cfg.AuthServiceURL, true, cfg))
 
 		// newsletter-management-service
 		r.Get("/listNewsletters", transport.ProxyRequest(cfg.NewsletterServiceURL, true, cfg))
