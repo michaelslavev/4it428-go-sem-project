@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"auth-service/handlers/model"
 	"context"
 	"encoding/json"
 	supa "github.com/nedpals/supabase-go"
@@ -8,15 +9,6 @@ import (
 	"net/http"
 	"strings"
 )
-
-type User struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
-type LoggedUserInfo struct {
-	RefreshToken string `json:"refresh_token"`
-}
 
 type CustomHandler struct {
 	SupabaseClient *supa.Client
@@ -50,7 +42,7 @@ func decodeRequest(w http.ResponseWriter, r *http.Request, dest interface{}) boo
 }
 
 func (hd *CustomHandler) RegisterHandler(w http.ResponseWriter, r *http.Request) {
-	var user User
+	var user model.User
 	if !decodeRequest(w, r, &user) {
 		return
 	}
@@ -69,7 +61,7 @@ func (hd *CustomHandler) RegisterHandler(w http.ResponseWriter, r *http.Request)
 }
 
 func (hd *CustomHandler) LoginHandler(w http.ResponseWriter, r *http.Request) {
-	var user User
+	var user model.User
 	if !decodeRequest(w, r, &user) {
 		return
 	}
@@ -88,7 +80,7 @@ func (hd *CustomHandler) LoginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (hd *CustomHandler) RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
-	var user LoggedUserInfo
+	var user model.LoggedUserInfo
 	if !decodeRequest(w, r, &user) {
 		return
 	}
@@ -106,7 +98,7 @@ func (hd *CustomHandler) RefreshTokenHandler(w http.ResponseWriter, r *http.Requ
 }
 
 func (hd *CustomHandler) ResetPasswordHandler(w http.ResponseWriter, r *http.Request) {
-	var user User
+	var user model.User
 	if !decodeRequest(w, r, &user) {
 		return
 	}
