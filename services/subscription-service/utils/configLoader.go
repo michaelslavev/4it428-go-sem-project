@@ -1,14 +1,18 @@
 package utils
 
 import (
-	"github.com/joho/godotenv"
 	"log"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 type ServerConfig struct {
-	IP   string
-	Port string
+	IP          string
+	Port        string
+	SupabaseURL string
+	SupabaseKEY string
+	DatabaseURL string
 }
 
 func LoadConfig(envPath string) ServerConfig {
@@ -17,8 +21,11 @@ func LoadConfig(envPath string) ServerConfig {
 	}
 
 	return ServerConfig{
-		IP:   getEnv("SERVER_IP", "0.0.0.0"),
-		Port: getEnv("SERVER_PORT", "8080"),
+		IP:          getEnv("SERVER_IP", "0.0.0.0"),
+		Port:        getEnv("SERVER_PORT", "8083"),
+		SupabaseURL: getEnv("SUPABASE_URL", "supabase.com"),
+		SupabaseKEY: getEnv("SUPABASE_KEY", "key"),
+		DatabaseURL: getEnv("DATABASE_URL", "url"),
 	}
 }
 

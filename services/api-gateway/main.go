@@ -30,6 +30,7 @@ func main() {
 		r.Get("/subscribers", transport.ProxyRequest(cfg.NewsletterServiceURL, false, cfg))
 
 		// subscription-service
+		r.Get("/subscriptions", transport.ProxyRequest(cfg.SubscriptionServiceURL, false, cfg))
 		r.Post("/subscribe", transport.ProxyRequest(cfg.SubscriptionServiceURL, false, cfg))
 		r.Post("/unsubscribe", transport.ProxyRequest(cfg.SubscriptionServiceURL, false, cfg))
 

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"publishing-service/handlers/sql"
+	"subscription-service/handlers/sql"
 
 	supa "github.com/nedpals/supabase-go"
 )
@@ -42,31 +42,12 @@ func decodeRequest(w http.ResponseWriter, r *http.Request, dest interface{}) boo
 	return true
 }
 
-func (hd *CustomHandler) GetPosts(w http.ResponseWriter, r *http.Request) {
-	posts, err := hd.Repository.ListPosts(r.Context())
+func (hd *CustomHandler) GetSubscriptions(w http.ResponseWriter, r *http.Request) {
+	subscriptions, err := hd.Repository.ListSubscriptions(r.Context())
 	if err != nil {
-		handleError(w, "Failed to fetch posts", err, http.StatusInternalServerError)
+		handleError(w, "Failed to fetch subscriptions", err, http.StatusInternalServerError)
 		return
 	}
 
-	sendJSON(w, posts, http.StatusOK)
+	sendJSON(w, subscriptions, http.StatusOK)
 }
-
-// func (hd *CustomHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
-// 	var newPost model.Post
-// 	if !decodeRequest(w, r, &newPost) {
-// 		return
-// 	}
-
-// 	post, err := hd.Repository.CreatePost(r.Context(), newPost)
-// 	if err != nil {
-// 		handleError(w, "Failed to fetch posts", err, http.StatusUnauthorized)
-// 		return
-// 	}
-// 	if err != nil {
-// 		handleError(w, "Failed to register user", err, http.StatusInternalServerError)
-// 		return
-// 	}
-
-// 	sendJSON(w, resp, http.StatusOK)
-// }
