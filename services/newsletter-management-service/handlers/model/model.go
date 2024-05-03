@@ -14,8 +14,3 @@ type NewNewsletter struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
 }
-
-type NewNewsletterDB struct {
-	Title       string `db:"title"`
-	Description string `db:"description"`
-}

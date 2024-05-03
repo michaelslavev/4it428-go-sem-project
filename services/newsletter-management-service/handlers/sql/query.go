@@ -8,6 +8,6 @@ var (
 	//go:embed queries/ListNewsletters.sql
 	ListNewslettersSQL string
 
-	//go:embed queries/ListNewsletters.sql
+	//go:embed queries/CreateNewsletter.sql
 	CreateNewsletterSQL string
 )
