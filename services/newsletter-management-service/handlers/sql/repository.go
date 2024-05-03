@@ -72,3 +72,17 @@ func (r *Repository) DeleteNewsletter(ctx context.Context, newsletterId string, 
 
 	return err
 }
+
+func (r *Repository) GetNewsletterSubscribers(ctx context.Context, newsletterId string, userId string) ([]model.Subscriber, error) {
+	var subscribers []model.Subscriber
+	err := pgxscan.Select(
+		ctx,
+		r.pool,
+		&subscribers,
+		GetNewsletterSubscribersSQL,
+		newsletterId,
+		userId,
+	)
+
+	return subscribers, err
+}

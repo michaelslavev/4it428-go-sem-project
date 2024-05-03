@@ -24,3 +24,7 @@ type APIResponse struct {
 	Status     int    `json:"status"`
 	StatusText string `json:"statusText"`
 }
+
+type Subscriber struct {
+	Email string `db:"email"`
+}

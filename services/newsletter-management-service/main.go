@@ -40,7 +40,7 @@ func main() {
 	})
 
 	r.Route("/api/subscribers", func(r chi.Router) {
-		r.Get("/{id}", hd.GetNewslettersHandler)
+		r.Get("/{id}", hd.GetNewsletterSubscribers)
 	})
 
 	// Starting server

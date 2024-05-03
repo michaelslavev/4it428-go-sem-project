@@ -25,10 +25,10 @@ func NewCustomHandler(client *supa.Client, repository *sql.Repository) *CustomHa
 
 func sendJSON(w http.ResponseWriter, data interface{}, statusCode int) {
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
 	if err := json.NewEncoder(w).Encode(data); err != nil {
 		http.Error(w, "Error encoding response", http.StatusInternalServerError)
 	}
+	w.WriteHeader(statusCode)
 }
 
 func handleError(w http.ResponseWriter, message string, err error, statusCode int) {
@@ -115,4 +115,23 @@ func (hd *CustomHandler) DeleteNewsletter(w http.ResponseWriter, r *http.Request
 	}
 
 	sendJSON(w, "", http.StatusNoContent)
+}
+
+func (hd *CustomHandler) GetNewsletterSubscribers(w http.ResponseWriter, r *http.Request) {
+	token := utils.GetBearerToken(r)
+	userUUId, _ := utils.ExtractSubFromToken(token)
+
+	postId := chi.URLParam(r, "id")
+	if postId == "" {
+		handleError(w, "ID is required", nil, http.StatusBadRequest)
+		return
+	}
+
+	subscribers, err := hd.Repository.GetNewsletterSubscribers(r.Context(), postId, userUUId)
+	if err != nil {
+		handleError(w, "Failed to fetch subscribers", err, http.StatusInternalServerError)
+		return
+	}
+	log.Printf("Subscribers: %v", subscribers)
+	sendJSON(w, subscribers, http.StatusOK)
 }

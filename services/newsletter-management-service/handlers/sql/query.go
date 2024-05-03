@@ -16,4 +16,7 @@ var (
 
 	//go:embed queries/DeleteNewsletter.sql
 	DeleteNewsletterSQL string
+
+	//go:embed queries/GetNewsletterSubscribers.sql
+	GetNewsletterSubscribersSQL string
 )
