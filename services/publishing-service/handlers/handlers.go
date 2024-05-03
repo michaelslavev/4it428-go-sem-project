@@ -55,15 +55,17 @@ func (hd *CustomHandler) GetPosts(w http.ResponseWriter, r *http.Request) {
 
 func (hd *CustomHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
 	var newPost model.NewPost
+
 	if !decodeRequest(w, r, &newPost) {
 		return
 	}
 
-	err := hd.Repository.CreatePost(r.Context(), newPost)
+	createdPost, err := hd.Repository.CreatePost(r.Context(), newPost)
+
 	if err != nil {
 		handleError(w, "Failed to create post", err, http.StatusInternalServerError)
 		return
 	}
 
-	sendJSON(w, "{}", http.StatusOK)
+	sendJSON(w, createdPost, http.StatusOK)
 }
