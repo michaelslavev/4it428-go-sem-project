@@ -6,5 +6,8 @@ import (
 
 var (
 	//go:embed queries/ListNewsletters.sql
-	ListNewsletters string
+	ListNewslettersSQL string
+
+	//go:embed queries/CreateNewsletter.sql
+	CreateNewsletterSQL string
 )

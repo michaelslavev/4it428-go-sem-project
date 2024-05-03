@@ -17,26 +17,21 @@ func main() {
 	r.Use(middleware.Logger)
 
 	r.Route("/api", func(r chi.Router) {
-		//-----| Public Routes
 		// auth-service
 		r.Post("/register", transport.ProxyRequest(cfg.AuthServiceURL, true, cfg))
 		r.Post("/login", transport.ProxyRequest(cfg.AuthServiceURL, true, cfg))
 		r.Post("/refreshToken", transport.ProxyRequest(cfg.AuthServiceURL, true, cfg))
-		//r.Post("/resetPassword", transport.ProxyRequest(cfg.AuthServiceURL, true, cfg))
-
+		
 		// newsletter-management-service
+		r.Post("/newsletters", transport.ProxyRequest(cfg.NewsletterServiceURL, false, cfg))
+		r.Put("/newsletters", transport.ProxyRequest(cfg.NewsletterServiceURL, false, cfg))
 		r.Get("/newsletters", transport.ProxyRequest(cfg.NewsletterServiceURL, true, cfg))
+		r.Delete("/newsletters", transport.ProxyRequest(cfg.NewsletterServiceURL, false, cfg))
 		r.Get("/subscribers", transport.ProxyRequest(cfg.PublishingServiceURL, false, cfg))
 
 		// subscription-service
 		r.Post("/subscribe", transport.ProxyRequest(cfg.SubscriptionServiceURL, true, cfg))
 		r.Post("/unsubscribe", transport.ProxyRequest(cfg.SubscriptionServiceURL, true, cfg))
-
-		//-----| Private Routes requiring JWT validation
-		// newsletter-management-service
-		r.Post("/createNewsletter", transport.ProxyRequest(cfg.NewsletterServiceURL, false, cfg))
-		r.Post("/renameNewsletter", transport.ProxyRequest(cfg.NewsletterServiceURL, false, cfg))
-		r.Post("/deleteNewsletter", transport.ProxyRequest(cfg.NewsletterServiceURL, false, cfg))
 
 		// publishing-service
 		r.Post("/posts", transport.ProxyRequest(cfg.PublishingServiceURL, false, cfg))

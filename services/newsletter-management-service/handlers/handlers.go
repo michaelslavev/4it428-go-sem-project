@@ -5,7 +5,9 @@ import (
 	supa "github.com/nedpals/supabase-go"
 	"log"
 	"net/http"
+	"newsletter-management-service/handlers/model"
 	"newsletter-management-service/handlers/sql"
+	"newsletter-management-service/utils"
 )
 
 type CustomHandler struct {
@@ -44,7 +46,7 @@ func decodeRequest(w http.ResponseWriter, r *http.Request, dest interface{}) boo
 func (hd *CustomHandler) GetNewslettersHandler(w http.ResponseWriter, r *http.Request) {
 	newsletters, err := hd.Repository.ListNewsletters(r.Context())
 	if err != nil {
-		handleError(w, "Failed to fetch newsletters", err, http.StatusUnauthorized)
+		handleError(w, "Failed to fetch newsletters", err, http.StatusInternalServerError)
 		return
 	}
 
@@ -52,10 +54,28 @@ func (hd *CustomHandler) GetNewslettersHandler(w http.ResponseWriter, r *http.Re
 }
 
 func (hd *CustomHandler) CreateNewsletter(w http.ResponseWriter, r *http.Request) {
-	panic("not implemented")
+	token := utils.GetBearerToken(r)
+	userUUId, _ := utils.ExtractSubFromToken(token)
+
+	var newNewsletter model.NewNewsletter
+	if !decodeRequest(w, r, &newNewsletter) {
+		return
+	}
+
+	err := hd.Repository.CreateNewsletter(r.Context(), newNewsletter, userUUId)
+	if err != nil {
+		handleError(w, "Failed to create newsletters", err, http.StatusInternalServerError)
+		return
+	}
+
+	sendJSON(w, "{}", http.StatusOK)
 }
 
 func (hd *CustomHandler) RenameNewsletter(w http.ResponseWriter, r *http.Request) {
+	// parse url to get id
+	// parse request body to get new name
+	// call repository to update newsletter name
+	// return response
 	panic("not implemented")
 }
 

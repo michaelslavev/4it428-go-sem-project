@@ -6,6 +6,7 @@ require github.com/go-chi/chi/v5 v5.0.12
 
 require (
 	github.com/georgysavva/scany/v2 v2.1.3
+	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/jackc/pgx/v5 v5.5.5
 	github.com/joho/godotenv v1.5.1
 	github.com/nedpals/supabase-go v0.4.0
