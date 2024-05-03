@@ -1,1 +1,0 @@
-INSERT INTO subscriptions VALUES (newsletter_id, subscriber_id)

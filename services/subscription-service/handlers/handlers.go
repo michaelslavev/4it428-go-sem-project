@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"subscription-service/handlers/model"
 	"subscription-service/handlers/sql"
+	"subscription-service/utils"
 
 	supa "github.com/nedpals/supabase-go"
 )
@@ -50,4 +52,22 @@ func (hd *CustomHandler) GetSubscriptions(w http.ResponseWriter, r *http.Request
 	}
 
 	sendJSON(w, subscriptions, http.StatusOK)
+}
+
+func (hd *CustomHandler) Subscribe(w http.ResponseWriter, r *http.Request) {
+	token := utils.GetBearerToken(r)
+	userUUId, _ := utils.ExtractSubFromToken(token)
+
+	var newSubscribe model.Subscribe
+	if !decodeRequest(w, r, &newSubscribe) {
+		return
+	}
+
+	subscription, err := hd.Repository.Subscribe(r.Context(), newSubscribe, userUUId)
+	if err != nil {
+		handleError(w, "Failed to subscribe", err, http.StatusInternalServerError)
+		return
+	}
+
+	sendJSON(w, subscription, http.StatusOK)
 }

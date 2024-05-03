@@ -8,3 +8,7 @@ type Subscription struct {
 	NewsletterID    string    `db:"newsletter_id"`
 	SubscriberID    string    `db:"subscriber_id"`
 }
+
+type Subscribe struct {
+	NewsletterID    string    `json:"newsletterId"`
+}
