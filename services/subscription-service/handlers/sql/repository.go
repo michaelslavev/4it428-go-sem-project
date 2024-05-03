@@ -2,7 +2,9 @@ package sql
 
 import (
 	"context"
+	"fmt"
 	"subscription-service/handlers/model"
+	"subscription-service/utils"
 
 	"github.com/georgysavva/scany/v2/pgxscan"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -18,30 +20,22 @@ func NewRepository(pool *pgxpool.Pool) *Repository {
 	}
 }
 
-func (r *Repository) ListSubscriptions(ctx context.Context) ([]model.Subscription, error) {
-	var subscriptions []model.Subscription
-	if err := pgxscan.Select(
-		ctx,
-		r.pool,
-		&subscriptions,
-		ListSubscriptionsSql,
-	); err != nil {
-		return nil, err
-	}
-
-	response := make([]model.Subscription, len(subscriptions))
-	for i, subscription := range subscriptions {
-		response[i] = model.Subscription{
-			ID: subscription.ID,
-			CreatedAt: subscription.CreatedAt,
-			NewsletterID: subscription.NewsletterID,
-			SubscriberID: subscription.SubscriberID,
-		}
-	}
-	return response, nil
-}
-
 func (r *Repository) Subscribe(ctx context.Context, newsletterId string, userId string) (model.Subscription, error) {
+	// Check if a subscription already exists
+    var count int
+
+    checkErr := pgxscan.Get(ctx, r.pool, &count, CheckSubscriptionsSql, newsletterId, userId)
+
+    if checkErr != nil {
+        return model.Subscription{}, fmt.Errorf("error checking existing subscription: %v", checkErr)
+    }
+
+    // If the subscription count is greater than 0, return an error indicating the subscription already exists
+    if count > 0 {
+        return model.Subscription{}, utils.ErrSubscriptionExists
+    }
+
+    // If no existing subscription, proceed to create a new one
 	var createdSubscription model.Subscription
 
 	err := pgxscan.Get(

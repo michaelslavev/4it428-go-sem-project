@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"subscription-service/handlers/sql"
@@ -36,16 +37,6 @@ func handleError(w http.ResponseWriter, message string, err error, statusCode in
 	http.Error(w, message, statusCode)
 }
 
-func (hd *CustomHandler) GetSubscriptions(w http.ResponseWriter, r *http.Request) {
-	subscriptions, err := hd.Repository.ListSubscriptions(r.Context())
-	if err != nil {
-		handleError(w, "Failed to fetch subscriptions", err, http.StatusInternalServerError)
-		return
-	}
-
-	sendJSON(w, subscriptions, http.StatusOK)
-}
-
 func (hd *CustomHandler) Subscribe(w http.ResponseWriter, r *http.Request) {
 	token := utils.GetBearerToken(r)
 	userUUId, _ := utils.ExtractSubFromToken(token)
@@ -58,9 +49,13 @@ func (hd *CustomHandler) Subscribe(w http.ResponseWriter, r *http.Request) {
 
 	subscription, err := hd.Repository.Subscribe(r.Context(), newsletterId, userUUId)
 	if err != nil {
-		handleError(w, "Failed to subscribe", err, http.StatusInternalServerError)
-		return
-	}
+        if errors.Is(err, utils.ErrSubscriptionExists) {
+            handleError(w, err.Error(), nil, http.StatusConflict) // 409 Conflict
+        } else {
+            handleError(w, "failed to subscribe", err, http.StatusInternalServerError)
+        }
+        return
+    }
 
 	sendJSON(w, subscription, http.StatusOK)
 }

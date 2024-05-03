@@ -5,8 +5,8 @@ import (
 )
 
 var (
-	//go:embed queries/ListSubscriptions.sql
-	ListSubscriptionsSql string
+	//go:embed queries/CheckSubscriptions.sql
+	CheckSubscriptionsSql string
 	//go:embed queries/Subscribe.sql
 	SubscribeSql string
 	//go:embed queries/Unsubcribe.sql

@@ -34,7 +34,6 @@ func main() {
 
 	hd := handlers.NewCustomHandler(supabase, repository)
 	r.Route("/api", func(r chi.Router) {
-		r.Get("/subscriptions", hd.GetSubscriptions)
 		r.Post("/subscribe/{id}", hd.Subscribe)
 		r.Post("/unsubscribe/{id}", hd.Unsubcribe)
 	})
