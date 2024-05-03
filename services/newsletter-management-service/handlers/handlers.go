@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"github.com/go-chi/chi/v5"
 	supa "github.com/nedpals/supabase-go"
 	"log"
 	"net/http"
@@ -72,11 +73,27 @@ func (hd *CustomHandler) CreateNewsletter(w http.ResponseWriter, r *http.Request
 }
 
 func (hd *CustomHandler) RenameNewsletter(w http.ResponseWriter, r *http.Request) {
-	// parse url to get id
-	// parse request body to get new name
-	// call repository to update newsletter name
-	// return response
-	panic("not implemented")
+	token := utils.GetBearerToken(r)
+	userUUId, _ := utils.ExtractSubFromToken(token)
+
+	id := chi.URLParam(r, "id")
+	if id == "" {
+		handleError(w, "ID is required", nil, http.StatusBadRequest)
+		return
+	}
+
+	var updatedNewsletter model.UpdateNewsletter
+	if !decodeRequest(w, r, &updatedNewsletter) {
+		return
+	}
+
+	updatedNewsletter.Id = id
+
+	err := hd.Repository.RenameNewsletter(r.Context(), updatedNewsletter, userUUId)
+	if err != nil {
+		handleError(w, "Failed to create newsletters", err, http.StatusInternalServerError)
+		return
+	}
 }
 
 func (hd *CustomHandler) DeleteNewsletter(w http.ResponseWriter, r *http.Request) {

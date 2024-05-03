@@ -14,3 +14,8 @@ type NewNewsletter struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
 }
+
+type UpdateNewsletter struct {
+	Id    string `json:"id"`
+	Title string `json:"title"`
+}

@@ -10,4 +10,7 @@ var (
 
 	//go:embed queries/CreateNewsletter.sql
 	CreateNewsletterSQL string
+
+	//go:embed queries/RenameNewsletter.sql
+	RenameNewsletterSQL string
 )

@@ -24,10 +24,10 @@ func main() {
 
 		// newsletter-management-service
 		r.Post("/newsletters", transport.ProxyRequest(cfg.NewsletterServiceURL, false, cfg))
-		r.Put("/newsletters", transport.ProxyRequest(cfg.NewsletterServiceURL, false, cfg))
+		r.Put("/newsletters/{id}", transport.ProxyRequest(cfg.NewsletterServiceURL, false, cfg))
 		r.Get("/newsletters", transport.ProxyRequest(cfg.NewsletterServiceURL, true, cfg))
-		r.Delete("/newsletters", transport.ProxyRequest(cfg.NewsletterServiceURL, false, cfg))
-		r.Get("/subscribers", transport.ProxyRequest(cfg.NewsletterServiceURL, false, cfg))
+		r.Delete("/newsletters/{id}", transport.ProxyRequest(cfg.NewsletterServiceURL, false, cfg))
+		r.Get("/subscribers/{id}", transport.ProxyRequest(cfg.NewsletterServiceURL, false, cfg))
 
 		// subscription-service
 		r.Get("/subscriptions", transport.ProxyRequest(cfg.SubscriptionServiceURL, false, cfg))

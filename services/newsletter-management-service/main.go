@@ -32,11 +32,15 @@ func main() {
 	r.Use(middleware.Logger)
 
 	hd := handlers.NewCustomHandler(supabase, repository)
-	r.Route("/api", func(r chi.Router) {
-		r.Get("/newsletters", hd.GetNewslettersHandler)
-		r.Post("/newsletters", hd.CreateNewsletter)
-		r.Put("/newsletters", hd.RenameNewsletter)
-		r.Delete("/newsletters", hd.DeleteNewsletter)
+	r.Route("/api/newsletters", func(r chi.Router) {
+		r.Get("/", hd.GetNewslettersHandler)
+		r.Post("/", hd.CreateNewsletter)
+		r.Put("/{id}", hd.RenameNewsletter)
+		r.Delete("/{id}", hd.DeleteNewsletter)
+	})
+
+	r.Route("/api/subscribers", func(r chi.Router) {
+		r.Get("/{id}", hd.GetNewslettersHandler)
 	})
 
 	// Starting server

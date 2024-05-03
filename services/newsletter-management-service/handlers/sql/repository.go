@@ -19,38 +19,35 @@ func NewRepository(pool *pgxpool.Pool) *Repository {
 
 func (r *Repository) ListNewsletters(ctx context.Context) ([]model.Newsletter, error) {
 	var newsletters []model.Newsletter
-	if err := pgxscan.Select(
+	err := pgxscan.Select(
 		ctx,
 		r.pool,
 		&newsletters,
 		ListNewslettersSQL,
-	); err != nil {
-		return nil, err
-	}
-
-	response := make([]model.Newsletter, len(newsletters))
-	for i, newsletter := range newsletters {
-		response[i] = model.Newsletter{
-			ID:          newsletter.ID,
-			CreatedAt:   newsletter.CreatedAt,
-			Title:       newsletter.Title,
-			Description: newsletter.Description,
-			EditorID:    newsletter.EditorID,
-		}
-	}
-	return response, nil
+	)
+	return newsletters, err
 }
 
 func (r *Repository) CreateNewsletter(ctx context.Context, newsletter model.NewNewsletter, userId string) error {
-	if _, err := r.pool.Exec(
+	_, err := r.pool.Exec(
 		ctx,
 		CreateNewsletterSQL,
 		newsletter.Title,
 		newsletter.Description,
 		userId,
-	); err != nil {
-		return err
-	}
+	)
 
-	return nil
+	return err
+}
+
+func (r *Repository) RenameNewsletter(ctx context.Context, newsletter model.UpdateNewsletter, userId string) error {
+	_, err := r.pool.Exec(
+		ctx,
+		RenameNewsletterSQL,
+		newsletter.Title,
+		newsletter.Id,
+		userId,
+	)
+
+	return err
 }
