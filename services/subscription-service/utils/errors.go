@@ -2,4 +2,4 @@ package utils
 
 import "errors"
 
-var ErrSubscriptionExists = errors.New("subscription already exists")
+var ErrSubscriptionExists = errors.New("you are already subscribed")
