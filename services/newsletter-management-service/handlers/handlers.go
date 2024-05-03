@@ -5,6 +5,7 @@ import (
 	supa "github.com/nedpals/supabase-go"
 	"log"
 	"net/http"
+	"newsletter-management-service/handlers/model"
 	"newsletter-management-service/handlers/sql"
 )
 
@@ -52,7 +53,22 @@ func (hd *CustomHandler) GetNewslettersHandler(w http.ResponseWriter, r *http.Re
 }
 
 func (hd *CustomHandler) CreateNewsletter(w http.ResponseWriter, r *http.Request) {
-	panic("not implemented")
+	var newNewsletter model.NewNewsletter
+	if !decodeRequest(w, r, &newNewsletter) {
+		return
+	}
+
+	newsletter, err := hd.Repository.CreateNewsletter(r.Context(), newNewsletter)
+	if err != nil {
+		handleError(w, "Failed to fetch newsletters", err, http.StatusUnauthorized)
+		return
+	}
+	if err != nil {
+		handleError(w, "Failed to register user", err, http.StatusInternalServerError)
+		return
+	}
+
+	sendJSON(w, resp, http.StatusOK)
 }
 
 func (hd *CustomHandler) RenameNewsletter(w http.ResponseWriter, r *http.Request) {

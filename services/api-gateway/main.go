@@ -33,8 +33,8 @@ func main() {
 		//-----| Private Routes requiring JWT validation
 		// newsletter-management-service
 		r.Post("/createNewsletter", transport.ProxyRequest(cfg.NewsletterServiceURL, false, cfg))
-		r.Post("/renameNewsletter", transport.ProxyRequest(cfg.NewsletterServiceURL, false, cfg))
-		r.Post("/deleteNewsletter", transport.ProxyRequest(cfg.NewsletterServiceURL, false, cfg))
+		r.Put("/putNewsletter", transport.ProxyRequest(cfg.NewsletterServiceURL, false, cfg))
+		r.Delete("/deleteNewsletter", transport.ProxyRequest(cfg.NewsletterServiceURL, false, cfg))
 
 		// publishing-service
 		r.Post("/publishPost", transport.ProxyRequest(cfg.PublishingServiceURL, false, cfg))

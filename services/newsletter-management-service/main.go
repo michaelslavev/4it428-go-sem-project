@@ -32,8 +32,8 @@ func main() {
 	r.Route("/api", func(r chi.Router) {
 		r.Get("/listNewsletters", hd.GetNewslettersHandler)
 		r.Post("/createNewsletter", hd.CreateNewsletter)
-		r.Post("/renameNewsletter", hd.RenameNewsletter)
-		r.Post("/deleteNewsletter", hd.DeleteNewsletter)
+		r.Put("/putNewsletter", hd.RenameNewsletter)
+		r.Delete("/deleteNewsletter", hd.DeleteNewsletter)
 	})
 
 	// Starting server

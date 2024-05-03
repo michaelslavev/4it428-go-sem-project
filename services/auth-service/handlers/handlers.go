@@ -47,8 +47,7 @@ func (hd *CustomHandler) RegisterHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	ctx := context.Background()
-	resp, err := hd.SupabaseClient.Auth.SignUp(ctx, supa.UserCredentials{
+	resp, err := hd.SupabaseClient.Auth.SignUp(r.Context(), supa.UserCredentials{
 		Email:    user.Email,
 		Password: user.Password,
 	})
@@ -66,8 +65,7 @@ func (hd *CustomHandler) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx := context.Background()
-	loggedUser, err := hd.SupabaseClient.Auth.SignIn(ctx, supa.UserCredentials{
+	loggedUser, err := hd.SupabaseClient.Auth.SignIn(r.Context(), supa.UserCredentials{
 		Email:    user.Email,
 		Password: user.Password,
 	})
@@ -87,8 +85,7 @@ func (hd *CustomHandler) RefreshTokenHandler(w http.ResponseWriter, r *http.Requ
 
 	tokenString := strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer ")
 
-	ctx := context.Background()
-	refreshedUser, err := hd.SupabaseClient.Auth.RefreshUser(ctx, tokenString, user.RefreshToken)
+	refreshedUser, err := hd.SupabaseClient.Auth.RefreshUser(r.Context(), tokenString, user.RefreshToken)
 	if err != nil {
 		handleError(w, "Failed to refresh token for user", err, http.StatusUnauthorized)
 		return

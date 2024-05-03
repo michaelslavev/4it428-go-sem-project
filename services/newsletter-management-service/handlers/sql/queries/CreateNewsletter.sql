@@ -1,0 +1,1 @@
+INSERT INTO newsletters (title, description)

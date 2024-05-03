@@ -23,7 +23,7 @@ func (r *Repository) ListNewsletters(ctx context.Context) ([]model.Newsletter, e
 		ctx,
 		r.pool,
 		&newsletters,
-		ListNewsletters,
+		ListNewslettersSQL,
 	); err != nil {
 		return nil, err
 	}
@@ -35,4 +35,17 @@ func (r *Repository) ListNewsletters(ctx context.Context) ([]model.Newsletter, e
 		}
 	}
 	return response, nil
+}
+
+func (r *Repository) CreateNewsletter(ctx context.Context, newsletter model.NewNewsletterDB) (error) {
+
+	if err := pgxscan.(
+		ctx,
+		r.pool,
+		&newsletter,
+		CreateNewsletterSQL,
+	); err != nil {
+		return model.NewNewsletterDB{}, err
+	}
+	return model.Newsletter{}, nil
 }
