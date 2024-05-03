@@ -3,10 +3,11 @@ package main
 import (
 	"api-gateway/transport"
 	"api-gateway/utils"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 	"log"
 	"net/http"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
 func main() {
@@ -24,7 +25,8 @@ func main() {
 		//r.Post("/resetPassword", transport.ProxyRequest(cfg.AuthServiceURL, true, cfg))
 
 		// newsletter-management-service
-		r.Get("/listNewsletters", transport.ProxyRequest(cfg.NewsletterServiceURL, true, cfg))
+		r.Get("/newsletters", transport.ProxyRequest(cfg.NewsletterServiceURL, true, cfg))
+		r.Get("/subscribers", transport.ProxyRequest(cfg.PublishingServiceURL, false, cfg))
 
 		// subscription-service
 		r.Post("/subscribe", transport.ProxyRequest(cfg.SubscriptionServiceURL, true, cfg))
@@ -37,8 +39,8 @@ func main() {
 		r.Post("/deleteNewsletter", transport.ProxyRequest(cfg.NewsletterServiceURL, false, cfg))
 
 		// publishing-service
-		r.Post("/publishPost", transport.ProxyRequest(cfg.PublishingServiceURL, false, cfg))
-		r.Get("/listSubscribers", transport.ProxyRequest(cfg.PublishingServiceURL, false, cfg))
+		r.Post("/posts", transport.ProxyRequest(cfg.PublishingServiceURL, false, cfg))
+		r.Get("/posts", transport.ProxyRequest(cfg.PublishingServiceURL, false, cfg))
 	})
 
 	// Starting server

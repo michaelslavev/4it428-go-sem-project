@@ -1,0 +1,1 @@
+INSERT INTO posts VALUES (title, content, newsletter_id)
