@@ -21,13 +21,13 @@ func main() {
 		r.Post("/register", transport.ProxyRequest(cfg.AuthServiceURL, true, cfg))
 		r.Post("/login", transport.ProxyRequest(cfg.AuthServiceURL, true, cfg))
 		r.Post("/refreshToken", transport.ProxyRequest(cfg.AuthServiceURL, true, cfg))
-		
+
 		// newsletter-management-service
 		r.Post("/newsletters", transport.ProxyRequest(cfg.NewsletterServiceURL, false, cfg))
 		r.Put("/newsletters", transport.ProxyRequest(cfg.NewsletterServiceURL, false, cfg))
 		r.Get("/newsletters", transport.ProxyRequest(cfg.NewsletterServiceURL, true, cfg))
 		r.Delete("/newsletters", transport.ProxyRequest(cfg.NewsletterServiceURL, false, cfg))
-		r.Get("/subscribers", transport.ProxyRequest(cfg.PublishingServiceURL, false, cfg))
+		r.Get("/subscribers", transport.ProxyRequest(cfg.NewsletterServiceURL, false, cfg))
 
 		// subscription-service
 		r.Post("/subscribe", transport.ProxyRequest(cfg.SubscriptionServiceURL, false, cfg))
