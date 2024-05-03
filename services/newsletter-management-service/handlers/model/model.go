@@ -19,3 +19,8 @@ type UpdateNewsletter struct {
 	Id    string `json:"id"`
 	Title string `json:"title"`
 }
+
+type APIResponse struct {
+	Status     int    `json:"status"`
+	StatusText string `json:"statusText"`
+}

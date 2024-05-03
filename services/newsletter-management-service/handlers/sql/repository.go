@@ -61,3 +61,14 @@ func (r *Repository) RenameNewsletter(ctx context.Context, newsletter model.Upda
 	}
 	return updatedNewsLetter, nil
 }
+
+func (r *Repository) DeleteNewsletter(ctx context.Context, newsletterId string, userId string) error {
+	_, err := r.pool.Exec(
+		ctx,
+		DeleteNewsletterSQL,
+		newsletterId,
+		userId,
+	)
+
+	return err
+}

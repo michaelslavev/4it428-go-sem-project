@@ -76,8 +76,8 @@ func (hd *CustomHandler) RenameNewsletter(w http.ResponseWriter, r *http.Request
 	token := utils.GetBearerToken(r)
 	userUUId, _ := utils.ExtractSubFromToken(token)
 
-	id := chi.URLParam(r, "id")
-	if id == "" {
+	postId := chi.URLParam(r, "id")
+	if postId == "" {
 		handleError(w, "ID is required", nil, http.StatusBadRequest)
 		return
 	}
@@ -87,7 +87,7 @@ func (hd *CustomHandler) RenameNewsletter(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	updatedNewsletter.Id = id
+	updatedNewsletter.Id = postId
 
 	uNewsletter, err := hd.Repository.RenameNewsletter(r.Context(), updatedNewsletter, userUUId)
 	if err != nil {
@@ -99,5 +99,20 @@ func (hd *CustomHandler) RenameNewsletter(w http.ResponseWriter, r *http.Request
 }
 
 func (hd *CustomHandler) DeleteNewsletter(w http.ResponseWriter, r *http.Request) {
-	panic("not implemented")
+	token := utils.GetBearerToken(r)
+	userUUId, _ := utils.ExtractSubFromToken(token)
+
+	postId := chi.URLParam(r, "id")
+	if postId == "" {
+		handleError(w, "ID is required", nil, http.StatusBadRequest)
+		return
+	}
+
+	err := hd.Repository.DeleteNewsletter(r.Context(), postId, userUUId)
+	if err != nil {
+		handleError(w, "Failed to delete newsletter", err, http.StatusInternalServerError)
+		return
+	}
+
+	sendJSON(w, "", http.StatusNoContent)
 }

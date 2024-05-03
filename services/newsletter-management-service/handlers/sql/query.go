@@ -13,4 +13,7 @@ var (
 
 	//go:embed queries/RenameNewsletter.sql
 	RenameNewsletterSQL string
+
+	//go:embed queries/DeleteNewsletter.sql
+	DeleteNewsletterSQL string
 )
