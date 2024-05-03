@@ -60,7 +60,7 @@ func (hd *CustomHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	createdPost, err := hd.Repository.CreatePost(r.Context(), newPost)
+	createdPost, err := hd.Repository.CreatePost(r.Context(), newPost, r)
 
 	if err != nil {
 		handleError(w, "Failed to create post", err, http.StatusInternalServerError)
