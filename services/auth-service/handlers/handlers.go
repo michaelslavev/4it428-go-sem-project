@@ -74,7 +74,14 @@ func (hd *CustomHandler) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sendJSON(w, loggedUser, http.StatusOK)
+	returnUser := model.ReturnedUser{
+		AccessToken:  loggedUser.AccessToken,
+		TokenType:    loggedUser.TokenType,
+		ExpiresIn:    loggedUser.ExpiresIn,
+		RefreshToken: loggedUser.RefreshToken,
+	}
+
+	sendJSON(w, returnUser, http.StatusOK)
 }
 
 func (hd *CustomHandler) RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
@@ -91,7 +98,14 @@ func (hd *CustomHandler) RefreshTokenHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	sendJSON(w, refreshedUser, http.StatusOK)
+	returnUser := model.ReturnedUser{
+		AccessToken:  refreshedUser.AccessToken,
+		TokenType:    refreshedUser.TokenType,
+		ExpiresIn:    refreshedUser.ExpiresIn,
+		RefreshToken: refreshedUser.RefreshToken,
+	}
+
+	sendJSON(w, returnUser, http.StatusOK)
 }
 
 func (hd *CustomHandler) ResetPasswordHandler(w http.ResponseWriter, r *http.Request) {

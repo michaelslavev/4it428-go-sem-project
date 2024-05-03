@@ -1,0 +1,349 @@
+openapi: 3.0.3
+info:
+  title: API Gateway
+  version: 1.0.0
+  description: This is a simple API Gateway that proxies requests to different services.
+servers:
+  - url: http://localhost:9069/api
+    description: Development server
+
+paths:
+  /openapi.yaml:
+    get:
+      summary: Get the OpenAPI specification
+      responses:
+        '200':
+          description: OpenAPI specification in YAML format
+          content:
+            application/yaml:
+              schema:
+                type: string
+                example: "swagger: '2.0'..."
+
+  /register:
+    post:
+      summary: Register a new user
+      tags:
+        - Auth Service
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCredentials'
+      responses:
+        '200':
+          description: Successful registration
+        '401':
+          description: Unauthorized
+        '500':
+          description: Failed to register
+
+  /login:
+    post:
+      summary: User login
+      tags:
+        - Auth Service
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCredentials'
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Unauthorized
+        '500':
+          description: Failed to login
+
+  /refreshToken:
+    post:
+      summary: Refresh the access token
+      tags:
+        - Auth Service
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+      responses:
+        '200':
+          description: Access token refreshed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Unauthorized if the refresh token is invalid
+        '500':
+          description: Failed to refresh token
+
+  /newsletters:
+    post:
+      summary: Create a newsletter
+      tags:
+        - Newsletter Management Service
+      security:
+        - Authorization: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+      responses:
+        '200':
+          description: Newsletter created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Newsletter'
+        '401':
+          description: Unauthorized if the authorization header is missing or invalid
+        '500':
+          description: Failed to create newsletters
+    get:
+      summary: List all newsletters
+      tags:
+        - Newsletter Management Service
+      security:
+        - Authorization: []
+      responses:
+        '200':
+          description: An array of newsletters
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Newsletter'
+        '401':
+          description: Unauthorized if the authorization header is missing or invalid
+        '500':
+          description: Failed to refresh newsletters
+
+
+  /newsletters/{id}:
+    put:
+      summary: Update a newsletter
+      tags:
+        - Newsletter Management Service
+      security:
+        - Authorization: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Unique identifier of the newsletter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+      responses:
+        '200':
+          description: Newsletter updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Newsletter'
+        '401':
+          description: Unauthorized if the authorization header is missing or invalid
+        '500':
+          description: Failed to update newsletter
+    delete:
+      summary: Delete a newsletter
+      tags:
+        - Newsletter Management Service
+      security:
+        - Authorization: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Unique identifier of the newsletter
+      responses:
+        '200':
+          description: Newsletter deleted
+        '401':
+          description: Unauthorized
+        '500':
+          description: Failed to delete newsletter
+
+  /subscribers/{id}:
+    get:
+      summary: Get subscriber details
+      tags:
+        - Newsletter Management Service
+      security:
+        - Authorization: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Unique identifier of the newsletter
+      responses:
+        '200':
+          description: An array of subscribers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Subscriber'
+        '401':
+          description: Unauthorized if the authorization header is missing or invalid
+        '500':
+          description: Failed to list newsletter subscribers
+
+  /subscribe/{id}:
+    post:
+      summary: Subscribe to a newsletter
+      tags:
+        - Subscription Service
+      security:
+        - Authorization: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Unique identifier of the newsletter to subscribe
+      responses:
+        '200':
+          description: Subscribed successfully
+        '401':
+          description: Unauthorized
+
+  /unsubscribe/{magicLink}:
+    post:
+      summary: Unsubscribe from a newsletter via. email sent magic link
+      tags:
+        - Subscription Service
+      parameters:
+        - in: path
+          name: magicLink
+          required: true
+          schema:
+            type: string
+            format: base64
+          description: Unique generated magic link identifying the newsletter to unsubscribe
+      responses:
+        '200':
+          description: Unsubscribed successfully
+        '401':
+          description: Unauthorized
+        '500':
+          description: Failed to unsubscribe from newsletter
+
+  /posts:
+    post:
+      summary: Create a post
+      tags:
+        - Publishing Service
+      security:
+        - Authorization: []
+      responses:
+        '200':
+          description: Post created
+        '401':
+          description: Unauthorized
+        '500':
+          description: Failed to create a post
+    get:
+      summary: List all posts
+      tags:
+        - Publishing Service
+      security:
+        - Authorization: []
+      responses:
+        '200':
+          description: List of posts
+        '401':
+          description: Unauthorized
+        '500':
+          description: Failed to list all posts
+
+components:
+  securitySchemes:
+    Authorization:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "Authorization header with bearer token"
+  schemas:
+    UserCredentials:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+    LoginResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+        token_type:
+          type: string
+          default: "bearer"
+        expires_in:
+          type: integer
+          format: int32
+        refresh_token:
+          type: string
+    RefreshTokenRequest:
+      type: object
+      properties:
+        refresh_token:
+          type: string
+    Newsletter:
+      type: object
+      properties:
+        ID:
+          type: string
+          format: uuid
+        CreatedAt:
+          type: string
+          format: date-time
+        Title:
+          type: string
+        Description:
+          type: string
+        EditorID:
+          type: string
+          format: uuid
+    Subscriber:
+      type: object
+      properties:
+        Email:
+          type: string
+          format: email
