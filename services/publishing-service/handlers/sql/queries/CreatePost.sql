@@ -1,1 +1,3 @@
-INSERT INTO posts VALUES (title, content, newsletter_id)
+INSERT INTO
+    posts (title, content, newsletter_id)
+VALUES ($1, $2, $3);

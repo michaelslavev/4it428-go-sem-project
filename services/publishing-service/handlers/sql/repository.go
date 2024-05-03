@@ -42,22 +42,16 @@ func (r *Repository) ListPosts(ctx context.Context) ([]model.Post, error) {
 	return response, nil
 }
 
-func (r *Repository) CreatePost(ctx context.Context) ([]model.Post, error) {
-var posts []model.Post
-if err := pgxscan.Select(
+func (r *Repository) CreatePost(ctx context.Context, post model.NewPost) error {
+	if _, err := r.pool.Exec(
 		ctx,
-		r.pool,
-		&posts,
-		ListPostsSql,
+		CreatePostSql,
+		post.Title,
+		post.Content,
+		post.NewsletterID,
 	); err != nil {
-		return nil, err
+		return err
 	}
 
-	response := make([]model.Post, len(posts))
-	for i, newsletter := range posts {
-		response[i] = model.Post{
-			ID: newsletter.ID,
-		}
-	}
-	return response, nil
+	return nil
 }

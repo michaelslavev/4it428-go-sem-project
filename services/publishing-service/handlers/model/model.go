@@ -9,3 +9,9 @@ type Post struct {
 	Content         string    `db:"content"`
 	NewsletterID    string    `db:"newsletter_id"`
 }
+
+type NewPost struct {
+	Title        string `json:"title"`
+	Content      string `json:"content"`
+	NewsletterID string `json:"newsletterId"`
+}

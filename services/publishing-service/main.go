@@ -35,6 +35,7 @@ func main() {
 	hd := handlers.NewCustomHandler(supabase, repository)
 	r.Route("/api", func(r chi.Router) {
 		r.Get("/posts", hd.GetPosts)
+		r.Post("/posts", hd.CreatePost)
 	})
 
 	// Starting server

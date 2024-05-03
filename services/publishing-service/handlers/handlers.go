@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"publishing-service/handlers/model"
 	"publishing-service/handlers/sql"
 
 	supa "github.com/nedpals/supabase-go"
@@ -52,21 +53,17 @@ func (hd *CustomHandler) GetPosts(w http.ResponseWriter, r *http.Request) {
 	sendJSON(w, posts, http.StatusOK)
 }
 
-// func (hd *CustomHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
-// 	var newPost model.Post
-// 	if !decodeRequest(w, r, &newPost) {
-// 		return
-// 	}
+func (hd *CustomHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
+	var newPost model.NewPost
+	if !decodeRequest(w, r, &newPost) {
+		return
+	}
 
-// 	post, err := hd.Repository.CreatePost(r.Context(), newPost)
-// 	if err != nil {
-// 		handleError(w, "Failed to fetch posts", err, http.StatusUnauthorized)
-// 		return
-// 	}
-// 	if err != nil {
-// 		handleError(w, "Failed to register user", err, http.StatusInternalServerError)
-// 		return
-// 	}
+	err := hd.Repository.CreatePost(r.Context(), newPost)
+	if err != nil {
+		handleError(w, "Failed to create post", err, http.StatusInternalServerError)
+		return
+	}
 
-// 	sendJSON(w, resp, http.StatusOK)
-// }
+	sendJSON(w, "{}", http.StatusOK)
+}
