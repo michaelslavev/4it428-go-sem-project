@@ -70,7 +70,7 @@ func (hd *CustomHandler) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		Password: user.Password,
 	})
 	if err != nil {
-		handleError(w, "Failed to login user", err, http.StatusUnauthorized)
+		handleError(w, "Failed to login user", err, http.StatusInternalServerError)
 		return
 	}
 
@@ -87,7 +87,7 @@ func (hd *CustomHandler) RefreshTokenHandler(w http.ResponseWriter, r *http.Requ
 
 	refreshedUser, err := hd.SupabaseClient.Auth.RefreshUser(r.Context(), tokenString, user.RefreshToken)
 	if err != nil {
-		handleError(w, "Failed to refresh token for user", err, http.StatusUnauthorized)
+		handleError(w, "Failed to refresh token for user", err, http.StatusInternalServerError)
 		return
 	}
 
@@ -103,7 +103,7 @@ func (hd *CustomHandler) ResetPasswordHandler(w http.ResponseWriter, r *http.Req
 	ctx := context.Background()
 	err := hd.SupabaseClient.Auth.ResetPasswordForEmail(ctx, user.Email)
 	if err != nil {
-		handleError(w, "Failed to reset password for user", err, http.StatusUnauthorized)
+		handleError(w, "Failed to reset password for user", err, http.StatusInternalServerError)
 		return
 	}
 
