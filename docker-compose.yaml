@@ -4,7 +4,7 @@ services:
   api-gateway:
     build: ./services/api-gateway
     ports:
-      - "8080:8080"
+      - "9069:8080"
     depends_on:
       - auth-service
       - newsletter-management-service
