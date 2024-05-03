@@ -24,7 +24,7 @@ func main() {
 		//r.Post("/resetPassword", transport.ProxyRequest(cfg.AuthServiceURL, true, cfg))
 
 		// newsletter-management-service
-		r.Get("/listNewsletters", transport.ProxyRequest(cfg.NewsletterServiceURL, true, cfg))
+		r.Get("/newsletters", transport.ProxyRequest(cfg.NewsletterServiceURL, true, cfg))
 
 		// subscription-service
 		r.Post("/subscribe", transport.ProxyRequest(cfg.SubscriptionServiceURL, true, cfg))
@@ -32,9 +32,9 @@ func main() {
 
 		//-----| Private Routes requiring JWT validation
 		// newsletter-management-service
-		r.Post("/createNewsletter", transport.ProxyRequest(cfg.NewsletterServiceURL, false, cfg))
-		r.Put("/putNewsletter", transport.ProxyRequest(cfg.NewsletterServiceURL, false, cfg))
-		r.Delete("/deleteNewsletter", transport.ProxyRequest(cfg.NewsletterServiceURL, false, cfg))
+		r.Post("/newsletters", transport.ProxyRequest(cfg.NewsletterServiceURL, false, cfg))
+		r.Put("/newsletters", transport.ProxyRequest(cfg.NewsletterServiceURL, false, cfg))
+		r.Delete("/newsletters", transport.ProxyRequest(cfg.NewsletterServiceURL, false, cfg))
 
 		// publishing-service
 		r.Post("/publishPost", transport.ProxyRequest(cfg.PublishingServiceURL, false, cfg))
