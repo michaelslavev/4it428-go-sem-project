@@ -63,13 +63,13 @@ func (hd *CustomHandler) CreateNewsletter(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	err := hd.Repository.CreateNewsletter(r.Context(), newNewsletter, userUUId)
+	createdNewsletter, err := hd.Repository.CreateNewsletter(r.Context(), newNewsletter, userUUId)
 	if err != nil {
 		handleError(w, "Failed to create newsletters", err, http.StatusInternalServerError)
 		return
 	}
 
-	sendJSON(w, "{}", http.StatusOK)
+	sendJSON(w, createdNewsletter, http.StatusOK)
 }
 
 func (hd *CustomHandler) RenameNewsletter(w http.ResponseWriter, r *http.Request) {
@@ -89,11 +89,13 @@ func (hd *CustomHandler) RenameNewsletter(w http.ResponseWriter, r *http.Request
 
 	updatedNewsletter.Id = id
 
-	err := hd.Repository.RenameNewsletter(r.Context(), updatedNewsletter, userUUId)
+	uNewsletter, err := hd.Repository.RenameNewsletter(r.Context(), updatedNewsletter, userUUId)
 	if err != nil {
-		handleError(w, "Failed to create newsletters", err, http.StatusInternalServerError)
+		handleError(w, "Failed to update newsletter", err, http.StatusInternalServerError)
 		return
 	}
+
+	sendJSON(w, uNewsletter, http.StatusOK)
 }
 
 func (hd *CustomHandler) DeleteNewsletter(w http.ResponseWriter, r *http.Request) {

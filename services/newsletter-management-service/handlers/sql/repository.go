@@ -28,26 +28,36 @@ func (r *Repository) ListNewsletters(ctx context.Context) ([]model.Newsletter, e
 	return newsletters, err
 }
 
-func (r *Repository) CreateNewsletter(ctx context.Context, newsletter model.NewNewsletter, userId string) error {
-	_, err := r.pool.Exec(
+func (r *Repository) CreateNewsletter(ctx context.Context, newsletter model.NewNewsletter, userId string) (model.Newsletter, error) {
+	var createdNewsletter model.Newsletter
+	err := pgxscan.Get(
 		ctx,
+		r.pool,
+		&createdNewsletter,
 		CreateNewsletterSQL,
 		newsletter.Title,
 		newsletter.Description,
 		userId,
 	)
-
-	return err
+	if err != nil {
+		return model.Newsletter{}, err
+	}
+	return createdNewsletter, nil
 }
 
-func (r *Repository) RenameNewsletter(ctx context.Context, newsletter model.UpdateNewsletter, userId string) error {
-	_, err := r.pool.Exec(
+func (r *Repository) RenameNewsletter(ctx context.Context, newsletter model.UpdateNewsletter, userId string) (model.Newsletter, error) {
+	var updatedNewsLetter model.Newsletter
+	err := pgxscan.Get(
 		ctx,
+		r.pool,
+		&updatedNewsLetter,
 		RenameNewsletterSQL,
 		newsletter.Title,
 		newsletter.Id,
 		userId,
 	)
-
-	return err
+	if err != nil {
+		return model.Newsletter{}, err
+	}
+	return updatedNewsLetter, nil
 }
