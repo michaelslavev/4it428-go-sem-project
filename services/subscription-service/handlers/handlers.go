@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"subscription-service/handlers/model"
 	"subscription-service/handlers/sql"
 	"subscription-service/utils"
 
+	"github.com/go-chi/chi/v5"
 	supa "github.com/nedpals/supabase-go"
 )
 
@@ -36,14 +36,6 @@ func handleError(w http.ResponseWriter, message string, err error, statusCode in
 	http.Error(w, message, statusCode)
 }
 
-func decodeRequest(w http.ResponseWriter, r *http.Request, dest interface{}) bool {
-	if err := json.NewDecoder(r.Body).Decode(dest); err != nil {
-		handleError(w, err.Error(), err, http.StatusBadRequest)
-		return false
-	}
-	return true
-}
-
 func (hd *CustomHandler) GetSubscriptions(w http.ResponseWriter, r *http.Request) {
 	subscriptions, err := hd.Repository.ListSubscriptions(r.Context())
 	if err != nil {
@@ -58,16 +50,36 @@ func (hd *CustomHandler) Subscribe(w http.ResponseWriter, r *http.Request) {
 	token := utils.GetBearerToken(r)
 	userUUId, _ := utils.ExtractSubFromToken(token)
 
-	var newSubscribe model.Subscribe
-	if !decodeRequest(w, r, &newSubscribe) {
+	newsletterId := chi.URLParam(r, "id")
+	if newsletterId == "" {
+		handleError(w, "ID is required", nil, http.StatusBadRequest)
 		return
 	}
 
-	subscription, err := hd.Repository.Subscribe(r.Context(), newSubscribe, userUUId)
+	subscription, err := hd.Repository.Subscribe(r.Context(), newsletterId, userUUId)
 	if err != nil {
 		handleError(w, "Failed to subscribe", err, http.StatusInternalServerError)
 		return
 	}
 
 	sendJSON(w, subscription, http.StatusOK)
+}
+
+func (hd *CustomHandler) Unsubcribe(w http.ResponseWriter, r *http.Request) {
+	token := utils.GetBearerToken(r)
+	userUUId, _ := utils.ExtractSubFromToken(token)
+
+	newsletterId := chi.URLParam(r, "id")
+	if newsletterId == "" {
+		handleError(w, "ID is required", nil, http.StatusBadRequest)
+		return
+	}
+
+	err := hd.Repository.Unsubcribe(r.Context(), newsletterId, userUUId)
+	if err != nil {
+		handleError(w, "Failed to unsubcribe", err, http.StatusInternalServerError)
+		return
+	}
+
+	sendJSON(w, "", http.StatusNoContent)
 }

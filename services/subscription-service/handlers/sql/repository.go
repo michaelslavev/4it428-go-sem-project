@@ -41,7 +41,7 @@ func (r *Repository) ListSubscriptions(ctx context.Context) ([]model.Subscriptio
 	return response, nil
 }
 
-func (r *Repository) Subscribe(ctx context.Context, post model.Subscribe, userId string) (model.Subscription, error) {
+func (r *Repository) Subscribe(ctx context.Context, newsletterId string, userId string) (model.Subscription, error) {
 	var createdSubscription model.Subscription
 
 	err := pgxscan.Get(
@@ -49,7 +49,7 @@ func (r *Repository) Subscribe(ctx context.Context, post model.Subscribe, userId
 		r.pool,
 		&createdSubscription,
 		SubscribeSql,
-		post.NewsletterID,
+		newsletterId,
 		userId,
 	)
 
@@ -58,4 +58,15 @@ func (r *Repository) Subscribe(ctx context.Context, post model.Subscribe, userId
 	}
 
 	return createdSubscription, nil
+}
+
+func (r *Repository) Unsubcribe(ctx context.Context, newsletterId string, userId string) error {
+	_, err := r.pool.Exec(
+		ctx,
+		UnsubcribeSql,
+		newsletterId,
+		userId,
+	)
+
+	return err
 }
