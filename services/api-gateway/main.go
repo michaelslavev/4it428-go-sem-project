@@ -4,10 +4,11 @@ import (
 	"api-gateway/transport"
 	"api-gateway/utils"
 	_ "embed"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 	"log"
 	"net/http"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
 //go:embed api/openapi.yaml
@@ -43,7 +44,7 @@ func main() {
 
 		// subscription-service
 		r.Post("/subscribe/{id}", transport.ProxyRequest(cfg.SubscriptionServiceURL, false, cfg))
-		r.Get("/unsubscribe/{magic}", transport.ProxyRequest(cfg.SubscriptionServiceURL, true, cfg))
+		r.Get("/unsubscribe", transport.ProxyRequest(cfg.SubscriptionServiceURL, true, cfg))
 
 		// publishing-service
 		r.Post("/posts", transport.ProxyRequest(cfg.PublishingServiceURL, false, cfg))

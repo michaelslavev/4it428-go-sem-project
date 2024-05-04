@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"embed"
 	"encoding/json"
 	"errors"
+	"io/fs"
 	"log"
 	"net/http"
 	"subscription-service/handlers/sql"
@@ -16,6 +18,9 @@ type CustomHandler struct {
 	SupabaseClient *supa.Client
 	Repository     *sql.Repository
 }
+
+//go:embed static/unsubscribed.html
+var unsubscribedPage embed.FS
 
 func NewCustomHandler(client *supa.Client, repository *sql.Repository) *CustomHandler {
 	return &CustomHandler{
@@ -61,20 +66,26 @@ func (hd *CustomHandler) Subscribe(w http.ResponseWriter, r *http.Request) {
 }
 
 func (hd *CustomHandler) Unsubcribe(w http.ResponseWriter, r *http.Request) {
-	token := utils.GetBearerToken(r)
-	userUUId, _ := utils.ExtractSubFromToken(token)
+	newsletterId := r.URL.Query().Get("newsletterId")
+    userId := r.URL.Query().Get("userId")
 
-	newsletterId := chi.URLParam(r, "id")
-	if newsletterId == "" {
-		handleError(w, "ID is required", nil, http.StatusBadRequest)
-		return
-	}
+	if newsletterId == "" || userId == "" {
+        http.Error(w, "Missing newsletterId or userId", http.StatusBadRequest)
+        return
+    }
 
-	err := hd.Repository.Unsubcribe(r.Context(), newsletterId, userUUId)
+	err := hd.Repository.Unsubcribe(r.Context(), newsletterId, userId)
 	if err != nil {
-		handleError(w, "Failed to unsubcribe", err, http.StatusInternalServerError)
+		handleError(w, "failed to unsubcribe", err, http.StatusInternalServerError)
 		return
 	}
 
-	sendJSON(w, "", http.StatusNoContent)
+	unsubbedPage, readErr := fs.ReadFile(unsubscribedPage, "static/unsubscribed.html")
+    if readErr != nil {
+        handleError(w, "Failed to load the unsubscribe page", readErr, http.StatusInternalServerError)
+        return
+    }
+
+	w.Header().Set("Content-Type", "text/html")
+	w.Write(unsubbedPage)
 }

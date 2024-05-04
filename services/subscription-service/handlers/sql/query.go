@@ -11,4 +11,6 @@ var (
 	SubscribeSql string
 	//go:embed queries/Unsubcribe.sql
 	UnsubcribeSql string
+	//go:embed queries/GetUserById.sql
+	GetUserByIdSql string
 )

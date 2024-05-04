@@ -35,7 +35,7 @@ func main() {
 	hd := handlers.NewCustomHandler(supabase, repository)
 	r.Route("/api", func(r chi.Router) {
 		r.Post("/subscribe/{id}", hd.Subscribe)
-		r.Post("/unsubscribe/{id}", hd.Unsubcribe)
+		r.Get("/unsubscribe", hd.Unsubcribe)
 	})
 
 	// Starting server
