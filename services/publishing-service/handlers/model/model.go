@@ -17,6 +17,7 @@ type NewPost struct {
 }
 
 type Subscriber struct {
+	ID	  string `db:"id"`
 	Email string `db:"email"`
 }
 

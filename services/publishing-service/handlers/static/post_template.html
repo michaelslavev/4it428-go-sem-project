@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>New post notification</title>
+  </head>
+  <body>
+    <h1>New Post Available: {{title}}</h1>
+    <p>{{content}}</p>
+    <hr />
+    <footer>
+      <p>
+        If you wish to unsubscribe and stop receiving these emails, please click
+        on the link below:
+      </p>
+      <p>
+        <a
+          href="{{unsubscribeUrl}}?newsletterId={{newsletterId}}&userId={{userId}}"
+          style="color: #1155cc"
+          >Unsubscribe</a
+        >
+      </p>
+    </footer>
+  </body>
+</html>

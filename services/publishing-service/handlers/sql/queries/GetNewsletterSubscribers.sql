@@ -1,4 +1,5 @@
 SELECT
+    u.id,
     u.email
 FROM
     auth.users AS u
