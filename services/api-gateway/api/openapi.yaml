@@ -134,7 +134,6 @@ paths:
         '500':
           description: Failed to refresh newsletters
 
-
   /newsletters/{id}:
     put:
       summary: Update a newsletter
@@ -238,58 +237,200 @@ paths:
           description: Unique identifier of the newsletter to subscribe
       responses:
         '200':
-          description: Subscribed successfully
+          description: Subscription created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ID:
+                    type: string
+                    format: uuid
+                    description: Unique identifier of the created subscription
+                  CreatedAt:
+                    type: string
+                    format: date-time
+                    description: Timestamp of when the subscription was created
+                  NewsletterID:
+                    type: string
+                    format: uuid
+                    description: Identifier of the newsletter subscribed to
+                  SubscriberID:
+                    type: string
+                    format: uuid
+                    description: Identifier of the subscriber
+              example:
+                ID: 'de042143-6910-418e-8de4-90f6c67c7519'
+                CreatedAt: '2024-05-05T20:23:35.894647Z'
+                NewsletterID: 'f38a7d05-8632-4ee0-a347-8449a51ba545'
+                SubscriberID: 'fda6a638-c4dd-444f-8de4-124833e85e76'
         '401':
           description: Unauthorized
+        '500':
+          description: Failed to subscribe to a newsletter
 
-  /unsubscribe/{magicLink}:
-    post:
-      summary: Unsubscribe from a newsletter via. email sent magic link
+  /unsubscribe:
+    get:
+      summary: Unsubscribe from a newsletter via email sent magic link
       tags:
         - Subscription Service
       parameters:
-        - in: path
-          name: magicLink
+        - in: query
+          name: newsletterId
           required: true
           schema:
             type: string
-            format: base64
-          description: Unique generated magic link identifying the newsletter to unsubscribe
+            format: uuid
+          description: The unique identifier of the newsletter
+        - in: query
+          name: userId
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The unique identifier of the user
       responses:
         '200':
           description: Unsubscribed successfully
+          content:
+            text/html:
+              schema:
+                type: string
+                example: |
+                  <html>
+                    <head><title>Sad to see you go!</title></head>
+                    <body>
+                      <h1>You have been successfully unsubscribed.</h1>
+                      <p>You will no longer receive newsletters from us.</p>
+                    </body>
+                  </html>
         '401':
           description: Unauthorized
         '500':
           description: Failed to unsubscribe from newsletter
 
-  /posts:
-    post:
-      summary: Create a post
-      tags:
-        - Publishing Service
-      security:
-        - Authorization: []
-      responses:
-        '200':
-          description: Post created
-        '401':
-          description: Unauthorized
-        '500':
-          description: Failed to create a post
+  /posts/{id}:
     get:
-      summary: List all posts
+      summary: List all posts in a given newsletter
       tags:
         - Publishing Service
       security:
         - Authorization: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Unique identifier of the newsletter
       responses:
         '200':
           description: List of posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    ID:
+                      type: string
+                      format: uuid
+                      description: Unique identifier of the post
+                    CreatedAt:
+                      type: string
+                      format: date-time
+                      description: The creation timestamp of the post
+                    Title:
+                      type: string
+                      description: The title of the post
+                    Content:
+                      type: string
+                      description: The content of the post
+                    NewsletterID:
+                      type: string
+                      format: uuid
+                      description: Identifier of the newsletter this post belongs to
+              example:
+                - ID: '8a2d8511-012d-4991-9207-d7d2b311e5b1'
+                  CreatedAt: '2024-05-03T16:07:26.655033Z'
+                  Title: 'Test post'
+                  Content: 'Well this is a post innit'
+                  NewsletterID: '49443416-2f74-4518-b6c5-b0110b43c9f4'
         '401':
           description: Unauthorized
         '500':
-          description: Failed to list all posts
+          description: Failed to list posts
+
+  /posts:
+    post:
+      summary: Create a new post within a newsletter
+      tags:
+        - Publishing Service
+      security:
+        - Authorization: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - content
+                - newsletterId
+              properties:
+                title:
+                  type: string
+                  description: The title of the post
+                content:
+                  type: string
+                  description: The content of the post
+                newsletterId:
+                  type: string
+                  format: uuid
+                  description: Unique identifier of the newsletter to which the post belongs
+            example:
+              title: 'Title'
+              content: 'Content'
+              newsletterId: 'f38a7d05-8632-4ee0-a347-8449a51ba545'
+      responses:
+        '200':
+          description: Post created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ID:
+                    type: string
+                    format: uuid
+                    description: Unique identifier of the created post
+                  CreatedAt:
+                    type: string
+                    format: date-time
+                    description: Timestamp of when the post was created
+                  Title:
+                    type: string
+                    description: Title of the post
+                  Content:
+                    type: string
+                    description: Content of the post
+                  NewsletterID:
+                    type: string
+                    format: uuid
+                    description: Identifier of the newsletter to which the post belongs
+              example:
+                ID: 'fdfbeddb-7fdc-4675-b54e-a1863d8933bb'
+                CreatedAt: '2024-05-05T21:32:36.298366Z'
+                Title: 'Title'
+                Content: 'Content'
+                NewsletterID: 'f38a7d05-8632-4ee0-a347-8449a51ba545'
+        '401':
+          description: Unauthorized
+        '500':
+          description: Failed to create post
 
 components:
   securitySchemes:
@@ -297,7 +438,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: "Authorization header with bearer token"
+      description: 'Authorization header with bearer token'
   schemas:
     UserCredentials:
       type: object
@@ -314,7 +455,7 @@ components:
           type: string
         token_type:
           type: string
-          default: "bearer"
+          default: 'bearer'
         expires_in:
           type: integer
           format: int32
