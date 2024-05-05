@@ -12,3 +12,7 @@ type Subscription struct {
 type Subscriber struct {
 	Email string `db:"email"`
 }
+
+type Newsletter struct {
+	Title string `db:"title"`
+}
