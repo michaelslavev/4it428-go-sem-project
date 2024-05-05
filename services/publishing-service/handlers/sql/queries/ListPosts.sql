@@ -1,3 +1,3 @@
 SELECT * 
-FROM 
-    posts
+FROM posts
+WHERE newsletter_id = $1 

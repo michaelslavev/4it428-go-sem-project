@@ -89,8 +89,7 @@ func (hd *CustomHandler) Subscribe(w http.ResponseWriter, r *http.Request) {
 	cfg := utils.LoadConfig(".env")
 	apiKey := cfg.ResendApiKey
 	client := resend.NewClient(apiKey)
-	// TODO: Change to production url
-	unsubscribeUrl := "http://localhost:9069/api/unsubscribe"
+	unsubscribeUrl := fmt.Sprintf("%s/api/unsubscribe", cfg.ServerUrl)
 
     data := map[string]string{
         "unsubscribeUrl": unsubscribeUrl,

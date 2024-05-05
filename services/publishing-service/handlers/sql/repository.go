@@ -20,13 +20,15 @@ func NewRepository(pool *pgxpool.Pool) *Repository {
 	}
 }
 
-func (r *Repository) ListPosts(ctx context.Context) ([]model.Post, error) {
+func (r *Repository) ListPosts(ctx context.Context, newsletterId string) ([]model.Post, error) {
 	var posts []model.Post
+
 	if err := pgxscan.Select(
 		ctx,
 		r.pool,
 		&posts,
 		ListPostsSql,
+		newsletterId,
 	); err != nil {
 		return nil, err
 	}

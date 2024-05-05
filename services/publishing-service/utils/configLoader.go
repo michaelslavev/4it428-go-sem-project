@@ -14,6 +14,7 @@ type ServerConfig struct {
 	SupabaseKEY  string
 	DatabaseURL  string
 	ResendApiKey string
+	ServerUrl	 string
 }
 
 func LoadConfig(envPath string) ServerConfig {
@@ -28,6 +29,7 @@ func LoadConfig(envPath string) ServerConfig {
 		SupabaseKEY:  getEnv("SUPABASE_KEY", "key"),
 		DatabaseURL:  getEnv("DATABASE_URL", "url"),
 		ResendApiKey: getEnv("RESEND_API_KEY", "re_Xxx"),
+		ServerUrl:    getEnv("SERVER_URL", "http://localhost:9069"),
 	}
 }
 

@@ -12,6 +12,7 @@ import (
 	"publishing-service/utils"
 	"strings"
 
+	"github.com/go-chi/chi/v5"
 	supa "github.com/nedpals/supabase-go"
 	"github.com/resend/resend-go/v2"
 )
@@ -74,7 +75,14 @@ func loadEmailTemplate(data map[string]string) (string, error) {
 }
 
 func (hd *CustomHandler) GetPosts(w http.ResponseWriter, r *http.Request) {
-	posts, err := hd.Repository.ListPosts(r.Context())
+	newsletterId := chi.URLParam(r, "id")
+
+	if newsletterId == "" {
+		handleError(w, "ID is required", nil, http.StatusBadRequest)
+		return
+	}
+	
+	posts, err := hd.Repository.ListPosts(r.Context(), newsletterId)
 	if err != nil {
 		handleError(w, "Failed to fetch posts", err, http.StatusInternalServerError)
 		return
@@ -100,8 +108,7 @@ func (hd *CustomHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
 	cfg := utils.LoadConfig(".env")
 	apiKey := cfg.ResendApiKey
 	client := resend.NewClient(apiKey)
-	// TODO: Change to production url
-	unsubscribeUrl := "http://localhost:9069/api/unsubscribe"
+	unsubscribeUrl := fmt.Sprintf("%s/api/unsubscribe", cfg.ServerUrl)
 
 	for _, subscriber := range subscribers {
 		data := map[string]string{
@@ -123,6 +130,10 @@ func (hd *CustomHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
             To:      []string{subscriber.Email},
             Subject: fmt.Sprintf("A new post in %s!", newsletter.Title),
             Html:    mail,
+			Headers: map[string]string{
+				"List-Unsubscribe": fmt.Sprintf("<%s?newsletterId=%s&userId=%s>", unsubscribeUrl, newsletter.ID, subscriber.ID),
+				"List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+			},
         }
 
         _, err := client.Emails.Send(params)

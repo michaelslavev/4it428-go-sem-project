@@ -47,8 +47,8 @@ func main() {
 		r.Get("/unsubscribe", transport.ProxyRequest(cfg.SubscriptionServiceURL, true, cfg))
 
 		// publishing-service
+		r.Get("/posts/{id}", transport.ProxyRequest(cfg.PublishingServiceURL, false, cfg))
 		r.Post("/posts", transport.ProxyRequest(cfg.PublishingServiceURL, false, cfg))
-		r.Get("/posts", transport.ProxyRequest(cfg.PublishingServiceURL, false, cfg))
 	})
 
 	r.Get("/ping", func(w http.ResponseWriter, _ *http.Request) {
